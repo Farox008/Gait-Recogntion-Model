@@ -17,6 +17,7 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 def main():
     ap = argparse.ArgumentParser(description="Test a single video clip against the Gait Gallery")
     ap.add_argument("video_path", help="Path to the video file to test")
+    ap.add_argument("--camera-id", default=None, help="Optional camera ID for viewpoint-specific recognition")
     ap.add_argument("--config",   default="configs/model_config.yaml")
     ap.add_argument("--max-frames", type=int, default=64)
     args = ap.parse_args()
@@ -39,7 +40,8 @@ def main():
                     device=device)
     gallery   = GaitGallery(
                     cfg["model"].get("gallery_index", "weights/gallery.faiss"),
-                    cfg["model"].get("gallery_meta",  "weights/gallery_meta.json"))
+                    cfg["model"].get("gallery_meta",  "weights/gallery_meta.json"),
+                    camera_id=args.camera_id)
 
     gallery.load()
 

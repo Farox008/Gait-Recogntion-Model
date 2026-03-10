@@ -135,6 +135,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--vods-dir",   default="../vods")
     ap.add_argument("--config",     default="configs/model_config.yaml")
+    ap.add_argument("--camera-id",  default=None, help="Optional camera ID for viewpoint-specific recognition")
     ap.add_argument("--max-frames", type=int,   default=64)
     ap.add_argument("--threshold",  type=float, default=None)
     ap.add_argument("--min-fill",   type=float, default=0.5,
@@ -161,7 +162,8 @@ def main():
                     device=device)
     gallery   = GaitGallery(
                     cfg["model"].get("gallery_index", "weights/gallery.faiss"),
-                    cfg["model"].get("gallery_meta",  "weights/gallery_meta.json"))
+                    cfg["model"].get("gallery_meta",  "weights/gallery_meta.json"),
+                    camera_id=args.camera_id)
 
     enroll_clips, test_clips = collect_clips(vods_dir)
     all_pids = sorted(set(list(enroll_clips) + list(test_clips)))

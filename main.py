@@ -122,6 +122,16 @@ class GaitPipeline:
         Process an RTSP stream or video file.
         Blocks until the stream ends or KeyboardInterrupt.
         """
+        # Re-initialize gallery with specific camera_id for runtime context
+        logger.info(f"Loading gallery context for Camera ID: {camera_id}")
+        self.gallery = GaitGallery(
+            index_path=self.model_cfg.get("gallery_index", "weights/gallery.faiss"),
+            meta_path =self.model_cfg.get("gallery_meta",  "weights/gallery_meta.json"),
+            camera_id=camera_id
+        )
+        self.gallery.load()
+        self.identifier = GaitIdentifier(self.gallery, self.embedder, self.id_cfg)
+
         frame_queue: Queue = Queue(maxsize=256)
         reader = StreamReader(source, camera_id, frame_queue)
         reader.start()
@@ -181,9 +191,19 @@ class GaitPipeline:
         finally:
             reader.stop()
 
-    def enroll_person(self, person_id: str, display_name: str, clip_path: str):
-        """Enroll a new known person from a video clip."""
-        logger.info(f"Enrolling '{display_name}' from {clip_path} …")
+    def enroll_person(self, person_id: str, display_name: str, clip_path: str, camera_id: str = None):
+        """Enroll a new known person from a video clip into a specific camera context."""
+        logger.info(f"Enrolling '{display_name}' from {clip_path} (Context: {camera_id or 'Global'}) …")
+        
+        # Reload gallery if camera_id context changes
+        if getattr(self.gallery, 'camera_id', None) != camera_id:
+             self.gallery = GaitGallery(
+                index_path=self.model_cfg.get("gallery_index", "weights/gallery.faiss"),
+                meta_path =self.model_cfg.get("gallery_meta",  "weights/gallery_meta.json"),
+                camera_id=camera_id
+             )
+             self.gallery.load()
+
         embedding = self.enrollment_embedder.embed_from_clip(clip_path)
         self.gallery.enroll(person_id, display_name, embedding)
         self.gallery.save()
@@ -235,7 +255,7 @@ def main():
     if args.cmd == "run":
         pipeline.run(args.source, args.camera_id)
     elif args.cmd == "enroll":
-        pipeline.enroll_person(args.person_id, args.name, args.clip)
+        pipeline.enroll_person(args.person_id, args.name, args.clip, camera_id=args.camera_id if hasattr(args, 'camera_id') else None)
     elif args.cmd == "test":
         logger.info("Running smoke-test — watching for alerts …")
         pipeline.run(args.source, args.camera_id)

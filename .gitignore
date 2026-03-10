@@ -1,8 +1,8 @@
-# Model weights (Large files)
-*.pt
-weights/deepgaitv2.pt
-weights/skeletongait++.pt
-yolov8n*.pt
+# Model weights (Managed locally or via Git LFS)
+# *.pt # Removed from ignore to allow LFS tracking
+# weights/deepgaitv2.pt
+# weights/skeletongait++.pt
+# yolov8n*.pt
 
 # Data and Clips
 clips/
