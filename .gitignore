@@ -1,0 +1,22 @@
+# Model weights (Large files)
+*.pt
+weights/deepgaitv2.pt
+weights/skeletongait++.pt
+yolov8n*.pt
+
+# Data and Clips
+clips/
+gallery/
+vods/
+
+# Python environment and logs
+__pycache__/
+*.log
+enroll_test_log*.txt
+debug_keys*.txt
+.deps_installed
+
+# OS/IDE
+.DS_Store
+.vscode/
+.idea/

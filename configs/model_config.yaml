@@ -1,0 +1,28 @@
+model:
+  device: cuda                    # or cpu
+  skeleton_weights: weights/skeletongait++.pt
+  silhouette_weights: weights/deepgaitv2.pt
+  fusion_weights: weights/fusion.pt
+  gallery_index: weights/gallery.faiss
+  gallery_meta: weights/gallery_meta.json
+
+pipeline:
+  detect_every_n_frames: 3
+  sequence_length: 64
+  min_frames_before_id: 30
+  heatmap_size: [128, 88]
+
+identification:
+  unknown_threshold: 0.90         # cosine similarity below = UNKNOWN (raise to 0.90+ in production for intruder detection)
+  consecutive_unknowns_required: 3
+  cooldown_seconds: 300
+
+backend:
+  url: http://localhost:8000
+  secret_key: change-me
+
+pretrained_weights:
+  download_from: https://huggingface.co/opengait/OpenGait
+  models_needed:
+    - SkeletonGait++ checkpoint
+    - DeepGaitV2 checkpoint

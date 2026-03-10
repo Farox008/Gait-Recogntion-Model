@@ -1,0 +1,15 @@
+{
+  "meta": {
+    "0": {
+      "person_id": "person_1",
+      "display_name": "Person A",
+      "enrolled_at": 1773149171.070389
+    },
+    "1": {
+      "person_id": "person_2",
+      "display_name": "Person B",
+      "enrolled_at": 1773149216.857926
+    }
+  },
+  "next_row": 2
+}
