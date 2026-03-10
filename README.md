@@ -1,125 +1,86 @@
-# Gait Recognition Model
+# 👋 Hello! Welcome to our Gait Recognition Model
 
-A high-performance, multi-modal Gait Recognition system that identifies individuals by the way they walk. This system combines **Skeleton-based** and **Silhouette-based** features to create a unique "gait fingerprint," and supports viewpoint-specific recognition for enhanced accuracy in CCTV environments.
+This project is the result of a lot of hard work by me and my team. We wanted to build something that doesn't just "see" people, but really understands how they move. Gait recognition—identifying someone just by their walk—is a tough challenge, but it’s incredibly powerful for security and smart monitoring.
 
-## 🚀 Key Features
-
-- **Multi-Modal Fusion**: Combines YOLOv8-Pose (skeletons) and YOLOv8-Seg (silhouettes) for robust identification.
-- **DeepGaitV2 & SkeletonGait++**: Integrates state-of-the-art encoders for feature extraction.
-- **Camera-Specific Recognition**: Supports separate galleries for different camera IDs to handle viewpoint variations.
-- **Interactive Runner**: A user-friendly CLI menu for training, testing, and batch processing.
-- **Live RTSP Support**: Capable of processing real-time streams and sending alerts to a backend.
-- **FAISS Powered**: Instant identification using Facebook AI Similarity Search.
+We’ve combined two different ways of looking at movement: **the way your joints move (Skeletons)** and **the shape of your body as you walk (Silhouettes)**. By putting these two together, we created a "fingerprint" for your walk that’s hard to fool!
 
 ---
 
-## 🛠 Project Architecture
+## ✨ What makes our project different?
 
-The system is built with a modular pipeline:
-
-1.  **Detection & Tracking**: YOLOv8 detects people, and a tracker maintains identity across frames.
-2.  **Feature Extraction**:
-    *   `PoseEstimator`: Extracts 2D skeletal joints.
-    *   `SilhouetteExtractor`: Generates binary silhouettes.
-3.  **Encoding**:
-    *   `SkeletonEncoder`: Process skeletons via spatio-temporal layers.
-    *   `SilhouetteEncoder`: Process silhouettes using DeepGaitV2 architecture.
-    *   `FusionModule`: Merges modalities into a single high-dimensional embedding.
-4.  **Gallery Management**: FAISS-backed index for ultra-fast similarity search and persistence.
-5.  **Alerting**: Sends JSON payloads with identification results and snapshots to a configured API.
+*   **We look at everything**: Instead of just using one method, our model uses YOLOv8-Pose and YOLOv8-Seg together. This makes it super robust, even if the lighting is poor or someone is wearing a big coat.
+*   **Built for different angles**: One of the biggest problems in gait recognition is that people look different from the side than from the front. We solved this with our **Camera-Specific Smart Gallery**. You can train the AI to recognize people's walk from a specific camera's perspective, making it much more accurate.
+*   **Super Fast**: We used FAISS (Facebook AI Similarity Search) to make sure the identification happens instantly. It’s built to handle live streams in real-time.
 
 ---
 
-## 🏃 Getting Started
+
+## Our Team 
+
+Without my team this project would not have been possible. I have to specially thank Angelina K Joseph for her creative ideas and her hard work in making this project a success,Belda Ben Thomas for doing documentation and paper subbmisions and especially Allena Varghese for collecting the dataset and her hard work in making this project a success.
+
+## 🧩 How it works 
+
+Under the hood, our pipeline does a few clever things:
+1.  **Tracking**: It spots a person and follows them through the video.
+2.  **The Details**: It draws an outline of their silhouette and maps out where their joints are.
+3.  **The Hybrid Brain**: We use "3D Hybrid Blocks." This is a fancy way of saying the model captures the **rhythm** of the walk over time, not just a still picture.
+4.  **Body Mapping**: It splits the person into 16 parts from head to toe, so it can pay separate attention to how feet move versus how arms swing.
+
+---
+
+## 🏃 Getting Started (Your First Run)
 
 ### 1. Prerequisites
-- Python 3.10+
-- CUDA-compatible GPU (Highly recommended for real-time performance)
-- Git LFS (Required to download the pre-trained weights)
+*   Make sure you have Python 3.10+.
+*   A GPU makes things much faster (CUDA), but CPU works too.
+*   **Important**: Install **Git LFS**! Our AI's "brain" files are large, so they need LFS to download properly.
 
-### 2. Installation
+### 2. Quick Setup
 ```bash
 git clone https://github.com/Farox008/Gait-Recogntion-Model.git
 cd Gait-Recogntion-Model
 
-# Install Git LFS to pull the large weight files
+# Download the model brains
 git lfs pull
 
-# Install dependencies
+# Install the bits and pieces
 pip install -r requirements.txt
 ```
 
-### 3. Running the Model
-The easiest way to use the system is via the **Interactive Runner**:
+### 3. Start the UI!
+Just run this and follow the menu:
 ```bash
 python run.py
 ```
-This script provides 6 options:
-1.  **Train (Enroll) only**: Process your VODs directory to register known people.
-2.  **Run (Test) only**: Run identification on your test data.
-3.  **Both**: Full pipeline (Enroll then Identify).
-4.  **Custom Directory Test**: Point the model at any folder containing video data.
-5.  **Single Video Test**: Quickly identify a person in one specific video file.
-6.  **Exit**
 
 ---
 
-## 📷 Viewpoint-Specific Recognition
-
-Gait can look different depending on the camera angle. To maximize accuracy, you can use the **Camera ID** feature:
-- When prompted in `run.py`, enter a unique ID for your camera (e.g., `lobby_east`).
-- The system will create/load a specific gallery for that camera (`weights/gallery_lobby_east.faiss`).
-- This restricts identification to the specific perspective of that camera, significantly reducing false positives.
-- **Global Fallback**: If you leave the Camera ID prompt blank, the model defaults to the global gallery (`gallery.faiss`).
+## 📹 Pro-Tip: Use Camera IDs
+If you're using this with multiple cameras, use the **Camera ID** feature (like `Gate-A` or `Lobby`). This tells the AI to create a specific "memory bank" for that angle, which gets you much closer to perfect accuracy.
 
 ---
 
-## 🧠 Deep Dive: Model Architecture & Accuracy
+## 📊 Performance (Our Team's Results)
 
-The **DeepGaitV2** and **SkeletonGait++** models in this project represent significant improvements over traditional gait recognition baselines.
+We tested this model on a **custom dataset that me and my team personally collected**, and we’re really proud of the results:
 
-### 1. Architectural Improvements
-*   **3D Hybrid Residual Blocks (`GaitResBlock3D`)**: Traditional models often use 2D CNNs (image-only) or basic 3-D CNNs (heavy & slow). Our backbone uses hybrid blocks that process frames with 2D convolutions (spatial) but maintain a 3D shortcut (temporal). This allows the model to capture the **rhythm** of a walk without the massive computational cost of full 3D convolutions.
-*   **Horizontal Part Partitioning (HPP)**: The model doesn't just look at the person as a whole. It splits the feature map into **16 horizontal strips** (from head to toe). This ensures the AI learns the specific movement of ankles, knees, and hips independently, making it far more precise than a global average.
-*   **Multi-Modal Gate Fusion**: In our skeleton-enhanced pipeline, we use a sigmoid-based **Attention Gate**. This gate dynamically decides whether the silhouette (shape) or the pose heatmap (joint location) is more reliable for each frame, significantly improving robustness against lighting or occlusion.
-
-### 2. Weight Files Explained
-*   **`deepgaitv2.pt`**: Trained on over 100,000 gait sequences. It produces a 256-dimensional "signature" focusing on the **silhouette dynamics**.
-*   **`skeletongait++.pt`**: Focuses on **skeletal articulation**. It is more robust when a person is wearing bulky clothes (which obscures silhouette shape).
-*   **`fusion.pt`**: Contains the weights for the Transformer-based fusion layer that merges the two perspectives into the final, high-accuracy embedding.
-*   **`yolov8n-seg.pt` / `yolov8n-pose.pt`**: The "eyes" of the system. These provide the raw data (masks and joints) that our gait encoders then analyze.
+*   **93.0% Overall Accuracy**: Out of 43 tests, 40 were spot on!
+*   **Why it's so high**: Because we used high-quality segmentation and multiple training clips per person.
+*   **Room for improvement**: The few misses happened when someone was walking directly toward the camera—a view where it's hard to see the leg swing. Using the **Camera ID** feature usually fixes this!
 
 ---
 
-## 📦 Model Weights (Git LFS)
-This repository uses **Git LFS** to manage large files.
-- `weights/deepgaitv2.pt`: Silhouette-based encoder.
-- `weights/skeletongait++.pt`: Skeleton-based encoder.
-- `weights/fusion.pt`: Multi-modal fusion weights.
-- `yolov8n-pose.pt`, `yolov8n-seg.pt`: Vision backbone models.
+## 📦 What are these files?
+- `deepgaitv2.pt`: The silhouette expert.
+- `skeletongait++.pt`: The joint movement expert.
+- `fusion.pt`: The master logic that joins them together.
+- `yolov8n*.pt`: The vision models that spot the people in the first place.
 
 ---
 
-## 📝 Recent Improvements & Changes
-- ✅ **New Interactive Runner**: Unified all scripts into a single `run.py` interface.
-- ✅ **Custom Test Logic**: Added support for testing single files and custom directories.
-- ✅ **Camera Indexing**: Implemented persistent camera-specific memory for the gallery.
-- ✅ **Segmentation Upgrade**: Switched to YOLOv8-Seg for much sharper silhouette extraction compared to traditional background subtraction.
-
----
-
-## 📊 Performance & Accuracy
-
-In our latest benchmark test on the custom VODs dataset, the system achieved an **Overall Accuracy of 93.0%** (40/43 correct identifications).
-
-### Why the accuracy is high:
-*   **Viewpoint Enrichment**: By using up to 3 enrollment clips per angle, the model develops a spatial understanding of a person's walk, allowing it to recognize them across different camera perspectives.
-*   **Segmentation-Based Outlines**: Utilizing YOLOv8-Seg ensures extremely clean binary masks, eliminating noise from shadows or dynamic backgrounds that typically plague gait models.
-*   **256-D Signatures**: High-dimensional embeddings backed by FAISS allow for precise mathematical separation between individuals, even with similar builds.
-
-### Root Causes of Misses:
-The remaining 7% of failures typically stem from two sources:
-1.  **Extreme Frontal/Back Views**: When a person walks directly towards or away from the camera, the lateral movement (swing) of the legs is minimized, reducing the distinctiveness of the gait.
-2.  **Significant Pace Variation**: Gait signatures can shift if a person is running versus walking slowly.
-
-**Pro-Tip**: To reach **100% accuracy**, utilize the **Camera-Specific Recognition** feature. Training a gallery specifically for a camera's fixed perspective removes all viewpoint-related noise.
+## 🚀 Recent Updates
+- ✅ **One-Script-To-Rule-Them-All**: The new `run.py` makes everything easy.
+- ✅ **Custom Folders**: Point the model at any video or folder.
+- ✅ **Pixel-Perfect Silhouettes**: Switched to YOLOv8-Seg for sharp, clean outlines.
+- ✅ **Viewpoint Memory**: Your trained people are now saved per-camera.
