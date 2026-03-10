@@ -17,7 +17,7 @@ We’ve combined two different ways of looking at movement: **the way your joint
 
 ## Our Team 
 
-Without my team this project would not have been possible. I have to specially thank Angelina K Joseph for her creative ideas and her hard work in making this project a success,Belda Ben Thomas for doing documentation and paper subbmisions and especially Allena Varghese for collecting the dataset and her hard work in making this project a success.
+Without my team this project would not have been possible. I have to specially thank Angelina K Joseph for her creative ideas and her hard work in making this project a success,Belda Ben Thomas for doing documentation and paper subbmisions and especially Aleena Varghese for collecting the dataset and her hard work in making this project a success.
 
 ## 🧩 How it works 
 
